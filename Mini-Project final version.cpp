@@ -1,147 +1,6 @@
 #include <iostream>
-#include <sstream>
 #include <string>
 using namespace std;
-
-// Shared input validation for all menus.
-bool readNumber(const string& message, int& number) {
-    string line;
-    char extra;
-
-    while (true) {
-        cout << message;
-
-        if (!getline(cin, line))
-            return false;
-
-        istringstream input(line);
-
-        if ((input >> number) && !(input >> extra))
-            return true;
-
-        cout << "Invalid input. Enter one integer.\n";
-    }
-}
-
-// ==================== QUEUE ====================
-
-const int QUEUE_SIZE = 5;
-int queueArray[QUEUE_SIZE];
-int queueCount = 0;
-
-bool queueIsEmpty() {
-    return queueCount == 0;
-}
-
-bool queueIsFull() {
-    return queueCount == QUEUE_SIZE;
-}
-
-void queueEnqueue(int value) {
-    if (queueIsFull()) {
-        cout << "Queue OVERFLOW! The queue is full. Cannot add "
-             << value << ".\n";
-    } else {
-        queueArray[queueCount] = value;
-        queueCount++;
-
-        cout << value
-             << " was added to the rear of the queue.\n";
-    }
-}
-
-void queueDequeue() {
-    if (queueIsEmpty()) {
-        cout << "Queue UNDERFLOW! The queue is empty. "
-             << "Nothing to remove.\n";
-    } else {
-        int removed = queueArray[0];
-
-        for (int i = 0; i < queueCount - 1; i++) {
-            queueArray[i] = queueArray[i + 1];
-        }
-
-        queueCount--;
-
-        cout << removed
-             << " was removed from the front of the queue.\n";
-    }
-}
-
-void queueFront() {
-    if (queueIsEmpty()) {
-        cout << "The queue is empty. There is no front item.\n";
-    } else {
-        cout << "Front item: " << queueArray[0] << "\n";
-    }
-}
-
-void queueRear() {
-    if (queueIsEmpty()) {
-        cout << "The queue is empty. There is no rear item.\n";
-    } else {
-        cout << "Rear item: "
-             << queueArray[queueCount - 1] << "\n";
-    }
-}
-
-void queueDisplay() {
-    if (queueIsEmpty()) {
-        cout << "The queue is empty.\n";
-    } else {
-        cout << "Queue (front -> rear): ";
-
-        for (int i = 0; i < queueCount; i++) {
-            cout << queueArray[i] << " ";
-        }
-
-        cout << "\n";
-    }
-}
-
-void queueMenu() {
-    int choice, value;
-
-    while (true) {
-        cout << "\n===== QUEUE MENU =====\n";
-        cout << "1. Enqueue\n";
-        cout << "2. Dequeue\n";
-        cout << "3. Front\n";
-        cout << "4. Rear\n";
-        cout << "5. Display\n";
-        cout << "0. Back to Main Menu\n";
-
-        if (!readNumber("Enter your choice: ", choice))
-            return;
-
-        if (choice == 1) {
-            if (!readNumber("Enter a number to add: ", value))
-                return;
-
-            queueEnqueue(value);
-            queueDisplay();
-
-        } else if (choice == 2) {
-            queueDequeue();
-            queueDisplay();
-
-        } else if (choice == 3) {
-            queueFront();
-
-        } else if (choice == 4) {
-            queueRear();
-
-        } else if (choice == 5) {
-            queueDisplay();
-
-        } else if (choice == 0) {
-            return;
-
-        } else {
-            cout << "Invalid choice! Choose 0 to 5.\n";
-        }
-    }
-}
 
 // ==================== SINGLY LINKED LIST ====================
 
@@ -171,7 +30,6 @@ void singlyDisplay() {
     }
 
     SinglyNode* current = singlyHead;
-
     cout << "List: ";
 
     while (current != nullptr) {
@@ -316,7 +174,7 @@ void singlyDeleteAtPosition(int position) {
     delete temp;
 }
 
-// Free remaining nodes only when the complete program exits.
+// Free remaining nodes when the complete program exits.
 void singlyClear() {
     while (singlyHead != nullptr) {
         SinglyNode* temp = singlyHead;
@@ -339,35 +197,85 @@ void singlyMenu() {
         cout << "7. Traverse / Display\n";
         cout << "0. Back to Linked List Menu\n";
 
-        if (!readNumber("Enter your choice: ", choice))
-            return;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if (cin.fail()) {
+            if (cin.eof())
+                return;
+
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input! Enter an integer.\n";
+            continue;
+        }
 
         switch (choice) {
             case 1:
-                if (!readNumber("Enter value: ", value))
-                    return;
+                cout << "Enter value: ";
+                cin >> value;
+
+                if (cin.fail()) {
+                    if (cin.eof())
+                        return;
+
+                    cin.clear();
+                    cin.ignore(1000, '\n');
+                    cout << "Invalid input! Enter an integer.\n";
+                    break;
+                }
 
                 singlyInsertBeginning(value);
                 singlyDisplay();
                 break;
 
             case 2:
-                if (!readNumber("Enter value: ", value))
-                    return;
+                cout << "Enter value: ";
+                cin >> value;
+
+                if (cin.fail()) {
+                    if (cin.eof())
+                        return;
+
+                    cin.clear();
+                    cin.ignore(1000, '\n');
+                    cout << "Invalid input! Enter an integer.\n";
+                    break;
+                }
 
                 cout << "Valid positions: 1 to "
                      << singlyLength() + 1 << "\n";
 
-                if (!readNumber("Enter position: ", position))
-                    return;
+                cout << "Enter position: ";
+                cin >> position;
+
+                if (cin.fail()) {
+                    if (cin.eof())
+                        return;
+
+                    cin.clear();
+                    cin.ignore(1000, '\n');
+                    cout << "Invalid input! Enter an integer.\n";
+                    break;
+                }
 
                 singlyInsertAtPosition(value, position);
                 singlyDisplay();
                 break;
 
             case 3:
-                if (!readNumber("Enter value: ", value))
-                    return;
+                cout << "Enter value: ";
+                cin >> value;
+
+                if (cin.fail()) {
+                    if (cin.eof())
+                        return;
+
+                    cin.clear();
+                    cin.ignore(1000, '\n');
+                    cout << "Invalid input! Enter an integer.\n";
+                    break;
+                }
 
                 singlyInsertEnd(value);
                 singlyDisplay();
@@ -387,8 +295,18 @@ void singlyMenu() {
                 cout << "Valid positions: 1 to "
                      << singlyLength() << "\n";
 
-                if (!readNumber("Enter position: ", position))
-                    return;
+                cout << "Enter position: ";
+                cin >> position;
+
+                if (cin.fail()) {
+                    if (cin.eof())
+                        return;
+
+                    cin.clear();
+                    cin.ignore(1000, '\n');
+                    cout << "Invalid input! Enter an integer.\n";
+                    break;
+                }
 
                 singlyDeleteAtPosition(position);
                 singlyDisplay();
@@ -412,6 +330,249 @@ void singlyMenu() {
     }
 }
 
+// ==================== STACK ====================
+
+class Stack {
+private:
+    static const int MAX = 5;
+    int arr[MAX];
+    int top;
+
+public:
+    Stack() {
+        top = -1;
+    }
+
+    bool stackEmpty() {
+        return top == -1;
+    }
+
+    bool isFull() {
+        return top == MAX - 1;
+    }
+
+    void push(int val) {
+        if (isFull()) {
+            cout << "Stack Overflow! Stack is full. Cannot push "
+                 << val << ".\n";
+            return;
+        }
+
+        top++;
+        arr[top] = val;
+
+        cout << "Successfully pushed "
+             << val << " onto the stack.\n";
+    }
+
+    int pop() {
+        if (stackEmpty()) {
+            cout << "Stack Underflow! Stack is empty. Cannot pop element.\n";
+            return -1;
+        }
+
+        int poppedVal = arr[top];
+        top--;
+
+        cout << "Popped element: " << poppedVal << "\n";
+
+        return poppedVal;
+    }
+
+    int peek() {
+        if (stackEmpty()) {
+            cout << "Stack is empty! No top element available.\n";
+            return -1;
+        }
+
+        cout << "Top element: " << arr[top] << "\n";
+
+        return arr[top];
+    }
+
+    void display() {
+        if (stackEmpty()) {
+            cout << "Stack is empty.\n";
+            return;
+        }
+
+        cout << "\nStack elements (Top to Bottom): ";
+
+        for (int i = top; i >= 0; i--) {
+            cout << arr[i] << " ";
+        }
+
+        cout << "\n";
+    }
+};
+
+void stackMenu() {
+    Stack s;
+    int choice, val;
+
+    do {
+        cout << "\n===== STACK MENU =====\n";
+        cout << "1. Push\n";
+        cout << "2. Pop\n";
+        cout << "3. Peek\n";
+        cout << "4. Display\n";
+        cout << "5. Return to Main Menu\n";
+        cout << "Enter your choice (1-5): ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter an integer value to push: ";
+                cin >> val;
+                s.push(val);
+                break;
+
+            case 2:
+                s.pop();
+                break;
+
+            case 3:
+                s.peek();
+                break;
+
+            case 4:
+                s.display();
+                break;
+
+            case 5:
+                cout << "Exiting Stack Submenu...\n";
+                break;
+
+            default:
+                cout << "\n[ERROR] Invalid choice! Please select an option between 1 and 5.\n";
+        }
+
+    } while (choice != 5);
+}
+
+// ==================== QUEUE ====================
+
+const int QUEUE_SIZE = 5;
+int queueArray[QUEUE_SIZE];
+int queueCount = 0;
+
+bool queueIsEmpty() {
+    return queueCount == 0;
+}
+
+bool queueIsFull() {
+    return queueCount == QUEUE_SIZE;
+}
+
+int queueGetNumber(string message) {
+    int number;
+    cout << message;
+    cin >> number;
+
+    while (cin.fail()) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "Invalid input! Please enter a number: ";
+        cin >> number;
+    }
+
+    cin.ignore(1000, '\n');
+    return number;
+}
+
+void queueEnqueue(int value) {
+    if (queueIsFull()) {
+        cout << "Queue OVERFLOW! The queue is full. Cannot add "
+             << value << ".\n";
+    } else {
+        queueArray[queueCount] = value;
+        queueCount++;
+
+        cout << value << " was added to the rear of the queue.\n";
+    }
+}
+
+void queueDequeue() {
+    if (queueIsEmpty()) {
+        cout << "Queue UNDERFLOW! The queue is empty. Nothing to remove.\n";
+    } else {
+        int removed = queueArray[0];
+
+        for (int i = 0; i < queueCount - 1; i++) {
+            queueArray[i] = queueArray[i + 1];
+        }
+
+        queueCount--;
+
+        cout << removed << " was removed from the front of the queue.\n";
+    }
+}
+
+void queueFront() {
+    if (queueIsEmpty()) {
+        cout << "The queue is empty. There is no front item.\n";
+    } else {
+        cout << "Front item: " << queueArray[0] << "\n";
+    }
+}
+
+void queueRear() {
+    if (queueIsEmpty()) {
+        cout << "The queue is empty. There is no rear item.\n";
+    } else {
+        cout << "Rear item: " << queueArray[queueCount - 1] << "\n";
+    }
+}
+
+void queueDisplay() {
+    if (queueIsEmpty()) {
+        cout << "The queue is empty.\n";
+    } else {
+        cout << "Queue (front -> rear): ";
+
+        for (int i = 0; i < queueCount; i++) {
+            cout << queueArray[i] << " ";
+        }
+
+        cout << "\n";
+    }
+}
+
+void queueMenu() {
+    int choice;
+
+    do {
+        cout << "\n===== QUEUE MENU =====\n";
+        cout << "1. Enqueue\n";
+        cout << "2. Dequeue\n";
+        cout << "3. Front\n";
+        cout << "4. Rear\n";
+        cout << "5. Display\n";
+        cout << "0. Back to Main Menu\n";
+
+        choice = queueGetNumber("Enter your choice: ");
+        cout << "\n";
+
+        if (choice == 1) {
+            int value = queueGetNumber("Enter a number to add: ");
+            queueEnqueue(value);
+        } else if (choice == 2) {
+            queueDequeue();
+        } else if (choice == 3) {
+            queueFront();
+        } else if (choice == 4) {
+            queueRear();
+        } else if (choice == 5) {
+            queueDisplay();
+        } else if (choice == 0) {
+            cout << "Going back to the main menu...\n";
+        } else {
+            cout << "Invalid choice! Please choose a number from 0 to 5.\n";
+        }
+
+    } while (choice != 0);
+}
+
 // ==================== LINKED LIST MENU ====================
 
 void linkedListMenu() {
@@ -424,8 +585,18 @@ void linkedListMenu() {
         cout << "3. Circular Linked List\n";
         cout << "0. Back to Main Menu\n";
 
-        if (!readNumber("Enter your choice: ", choice))
-            return;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if (cin.fail()) {
+            if (cin.eof())
+                return;
+
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input! Enter an integer.\n";
+            continue;
+        }
 
         switch (choice) {
             case 1:
@@ -433,12 +604,12 @@ void linkedListMenu() {
                 break;
 
             case 2:
-                // Replace with the doubly linked list menu call.
+                // Add the doubly linked list menu call here.
                 cout << "Doubly Linked List has not been added yet.\n";
                 break;
 
             case 3:
-                // Replace with the circular linked list menu call.
+                // Add the circular linked list menu call here.
                 cout << "Circular Linked List has not been added yet.\n";
                 break;
 
@@ -464,13 +635,22 @@ int main() {
         cout << "3. Linked List\n";
         cout << "0. Exit\n";
 
-        if (!readNumber("Enter your choice: ", choice))
-            break;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if (cin.fail()) {
+            if (cin.eof())
+                break;
+
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input! Enter an integer.\n";
+            continue;
+        }
 
         switch (choice) {
             case 1:
-                // Replace with the stack menu call.
-                cout << "Stack has not been added yet.\n";
+                stackMenu();
                 break;
 
             case 2:
