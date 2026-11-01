@@ -2,6 +2,27 @@
 #include <string>
 using namespace std;
 
+// Shared input checker for every menu, value and position.
+// The & lets this function update the caller's variable.
+bool readNumber(string message, int& number) {
+    cout << message;
+    cin >> number;
+
+    while (cin.fail()) {
+        if (cin.eof())
+            return false;
+
+        cin.clear();
+        cin.ignore(1000, '\n');
+
+        cout << "Invalid input! Enter an integer: ";
+        cin >> number;
+    }
+
+    cin.ignore(1000, '\n');
+    return true;
+}
+
 // ==================== SINGLY LINKED LIST ====================
 
 struct SinglyNode {
@@ -70,6 +91,7 @@ void singlyInsertEnd(int value) {
     cout << value << " inserted.\n";
 }
 
+// Positions start at 1.
 void singlyInsertAtPosition(int value, int position) {
     int length = singlyLength();
 
@@ -92,6 +114,7 @@ void singlyInsertAtPosition(int value, int position) {
     SinglyNode* newNode = new SinglyNode;
     newNode->data = value;
 
+    // Connect the new node before changing the previous link.
     newNode->next = current->next;
     current->next = newNode;
 
@@ -160,6 +183,8 @@ void singlyDeleteAtPosition(int position) {
         current = current->next;
 
     SinglyNode* temp = current->next;
+
+    // Bypass the node before releasing its memory.
     current->next = temp->next;
 
     cout << temp->data << " deleted from position "
@@ -168,7 +193,6 @@ void singlyDeleteAtPosition(int position) {
     delete temp;
 }
 
-// Free remaining nodes when the complete program exits.
 void singlyClear() {
     while (singlyHead != nullptr) {
         SinglyNode* temp = singlyHead;
@@ -191,85 +215,35 @@ void singlyMenu() {
         cout << "7. Traverse / Display\n";
         cout << "0. Back to Linked List Menu\n";
 
-        cout << "Enter your choice: ";
-        cin >> choice;
-
-        if (cin.fail()) {
-            if (cin.eof())
-                return;
-
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << "Invalid input! Enter an integer.\n";
-            continue;
-        }
+        if (!readNumber("Enter your choice: ", choice))
+            return;
 
         switch (choice) {
             case 1:
-                cout << "Enter value: ";
-                cin >> value;
-
-                if (cin.fail()) {
-                    if (cin.eof())
-                        return;
-
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << "Invalid input! Enter an integer.\n";
-                    break;
-                }
+                if (!readNumber("Enter value: ", value))
+                    return;
 
                 singlyInsertBeginning(value);
                 singlyDisplay();
                 break;
 
             case 2:
-                cout << "Enter value: ";
-                cin >> value;
-
-                if (cin.fail()) {
-                    if (cin.eof())
-                        return;
-
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << "Invalid input! Enter an integer.\n";
-                    break;
-                }
+                if (!readNumber("Enter value: ", value))
+                    return;
 
                 cout << "Valid positions: 1 to "
                      << singlyLength() + 1 << "\n";
 
-                cout << "Enter position: ";
-                cin >> position;
-
-                if (cin.fail()) {
-                    if (cin.eof())
-                        return;
-
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << "Invalid input! Enter an integer.\n";
-                    break;
-                }
+                if (!readNumber("Enter position: ", position))
+                    return;
 
                 singlyInsertAtPosition(value, position);
                 singlyDisplay();
                 break;
 
             case 3:
-                cout << "Enter value: ";
-                cin >> value;
-
-                if (cin.fail()) {
-                    if (cin.eof())
-                        return;
-
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << "Invalid input! Enter an integer.\n";
-                    break;
-                }
+                if (!readNumber("Enter value: ", value))
+                    return;
 
                 singlyInsertEnd(value);
                 singlyDisplay();
@@ -289,18 +263,8 @@ void singlyMenu() {
                 cout << "Valid positions: 1 to "
                      << singlyLength() << "\n";
 
-                cout << "Enter position: ";
-                cin >> position;
-
-                if (cin.fail()) {
-                    if (cin.eof())
-                        return;
-
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << "Invalid input! Enter an integer.\n";
-                    break;
-                }
+                if (!readNumber("Enter position: ", position))
+                    return;
 
                 singlyDeleteAtPosition(position);
                 singlyDisplay();
@@ -398,8 +362,10 @@ public:
     }
 };
 
+// Created once, so leaving the submenu does not erase the stack.
+Stack s;
+
 void stackMenu() {
-    Stack s;
     int choice, val;
 
     do {
@@ -409,13 +375,15 @@ void stackMenu() {
         cout << "3. Peek\n";
         cout << "4. Display\n";
         cout << "5. Return to Main Menu\n";
-        cout << "Enter your choice (1-5): ";
-        cin >> choice;
+
+        if (!readNumber("Enter your choice (1-5): ", choice))
+            return;
 
         switch (choice) {
             case 1:
-                cout << "Enter an integer value to push: ";
-                cin >> val;
+                if (!readNumber("Enter an integer value to push: ", val))
+                    return;
+
                 s.push(val);
                 break;
 
@@ -456,22 +424,6 @@ bool queueIsFull() {
     return queueCount == QUEUE_SIZE;
 }
 
-int queueGetNumber(string message) {
-    int number;
-    cout << message;
-    cin >> number;
-
-    while (cin.fail()) {
-        cin.clear();
-        cin.ignore(1000, '\n');
-        cout << "Invalid input! Please enter a number: ";
-        cin >> number;
-    }
-
-    cin.ignore(1000, '\n');
-    return number;
-}
-
 void queueEnqueue(int value) {
     if (queueIsFull()) {
         cout << "Queue OVERFLOW! The queue is full. Cannot add "
@@ -490,6 +442,7 @@ void queueDequeue() {
     } else {
         int removed = queueArray[0];
 
+        // Move the remaining items forward after removing the front item.
         for (int i = 0; i < queueCount - 1; i++) {
             queueArray[i] = queueArray[i + 1];
         }
@@ -531,7 +484,7 @@ void queueDisplay() {
 }
 
 void queueMenu() {
-    int choice;
+    int choice, value;
 
     do {
         cout << "\n===== QUEUE MENU =====\n";
@@ -542,11 +495,15 @@ void queueMenu() {
         cout << "5. Display\n";
         cout << "0. Back to Main Menu\n";
 
-        choice = queueGetNumber("Enter your choice: ");
+        if (!readNumber("Enter your choice: ", choice))
+            return;
+
         cout << "\n";
 
         if (choice == 1) {
-            int value = queueGetNumber("Enter a number to add: ");
+            if (!readNumber("Enter a number to add: ", value))
+                return;
+
             queueEnqueue(value);
         } else if (choice == 2) {
             queueDequeue();
@@ -608,18 +565,20 @@ void insertEnd(int value) {
     temp->next = newNode;
 }
 
+// Position 1 is the first node.
+// Insertion also allows length + 1, which adds at the end.
 void insertMiddle(int value, int position) {
-    if (position < 0) {
+    if (position < 1) {
         return;
     }
 
-    if (position == 0) {
+    if (position == 1) {
         insertBeginning(value);
         return;
     }
 
     Node* temp = head;
-    int count = 0;
+    int count = 1;
 
     while ((temp != NULL) && (count < position - 1)) {
         temp = temp->next;
@@ -685,12 +644,12 @@ void deleteMiddle(int position) {
         return;
     }
 
-    if (position < 0) {
+    if (position < 1) {
         return;
     }
 
     Node* temp = head;
-    int count = 0;
+    int count = 1;
 
     while ((temp != NULL) && (count < position)) {
         temp = temp->next;
@@ -779,20 +738,10 @@ void doublyMenu() {
         cout << "7. Forward traverse\n";
         cout << "8. Backward traverse\n";
         cout << "0. Back to Linked List Menu\n";
-        cout << "Positions in this list start at 0.\n";
+        cout << "Positions in this list start at 1.\n";
 
-        cout << "Enter your choice: ";
-        cin >> choice;
-
-        if (cin.fail()) {
-            if (cin.eof())
-                return;
-
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << "Invalid input! Enter an integer.\n";
-            continue;
-        }
+        if (!readNumber("Enter your choice: ", choice))
+            return;
 
         if (choice == 0)
             return;
@@ -808,43 +757,24 @@ void doublyMenu() {
         }
 
         if (choice >= 1 && choice <= 3) {
-            cout << "Enter value: ";
-            cin >> value;
-
-            if (cin.fail()) {
-                if (cin.eof())
-                    return;
-
-                cin.clear();
-                cin.ignore(1000, '\n');
-                cout << "Invalid input! Enter an integer.\n";
-                continue;
-            }
+            if (!readNumber("Enter value: ", value))
+                return;
         }
 
         if (choice == 2 || choice == 5) {
             int lastPosition = doublyLength();
 
-            if (choice == 5)
-                lastPosition--;
+            // Insertion allows one position beyond the current last node.
+            if (choice == 2)
+                lastPosition++;
 
-            cout << "Valid positions: 0 to "
+            cout << "Valid positions: 1 to "
                  << lastPosition << "\n";
 
-            cout << "Enter position: ";
-            cin >> position;
+            if (!readNumber("Enter position: ", position))
+                return;
 
-            if (cin.fail()) {
-                if (cin.eof())
-                    return;
-
-                cin.clear();
-                cin.ignore(1000, '\n');
-                cout << "Invalid input! Enter an integer.\n";
-                continue;
-            }
-
-            if (position < 0 || position > lastPosition) {
+            if (position < 1 || position > lastPosition) {
                 cout << "Invalid position.\n";
                 continue;
             }
@@ -903,7 +833,7 @@ void doublyMenu() {
 
 // ==================== CIRCULAR LINKED LIST ====================
 
-// Separate names from the Doubly Linked List code.
+// Keep these names separate from the doubly linked list names.
 namespace CircularList {
 
 struct Node {
@@ -917,49 +847,7 @@ Node* tail = NULL;
 Node* current = NULL;
 Node* auxiliar = NULL;
 
-int readInt(string message) {
-    string text;
-
-    while (true) {
-        cout << message;
-        cin >> text;
-
-        bool valid = true;
-        int start = 0;
-
-        if (text[0] == '-') {
-            start = 1;
-        }
-
-        if (text.length() == start || text.length() > start + 9) {
-            valid = false;
-        }
-
-        for (int i = start; i < text.length(); i++) {
-            if (text[i] < '0' || text[i] > '9') {
-                valid = false;
-            }
-        }
-
-        if (valid) {
-            int number = 0;
-
-            for (int i = start; i < text.length(); i++) {
-                number = number * 10 + (text[i] - '0');
-            }
-
-            if (start == 1) {
-                number = -number;
-            }
-
-            return number;
-        }
-
-        cout << "Invalid input. Please enter a whole number.\n";
-    }
-}
-
-// Counts how many nodes the list has.
+// Stop counting when traversal returns to the first node.
 int countNodes() {
     if (head == NULL) {
         return 0;
@@ -1166,7 +1054,7 @@ void circularTraverse() {
 }
 
 void circularMenu() {
-    int option;
+    int option, value, position;
 
     do {
         cout << "\n=== CIRCULAR LINKED LIST ===\n";
@@ -1179,22 +1067,32 @@ void circularMenu() {
         cout << "7. Circular traverse\n";
         cout << "0. Back\n";
 
-        option = readInt("Choose an option: ");
+        if (!readNumber("Choose an option: ", option))
+            return;
 
         switch (option) {
             case 1:
-                insertBeginning(readInt("Value: "));
+                if (!readNumber("Value: ", value))
+                    return;
+
+                insertBeginning(value);
                 break;
 
-            case 2: {
-                int value = readInt("Value: ");
-                int position = readInt("Position: ");
+            case 2:
+                if (!readNumber("Value: ", value))
+                    return;
+
+                if (!readNumber("Position: ", position))
+                    return;
+
                 insertMiddle(value, position);
                 break;
-            }
 
             case 3:
-                insertEnd(readInt("Value: "));
+                if (!readNumber("Value: ", value))
+                    return;
+
+                insertEnd(value);
                 break;
 
             case 4:
@@ -1202,7 +1100,10 @@ void circularMenu() {
                 break;
 
             case 5:
-                deleteMiddle(readInt("Position: "));
+                if (!readNumber("Position: ", position))
+                    return;
+
+                deleteMiddle(position);
                 break;
 
             case 6:
@@ -1228,9 +1129,8 @@ void circularMenu() {
     } while (option != 0);
 }
 
-// Cleanup added for the combined application.
 void circularClear() {
-    // Break the circle so nodes can be deleted in a normal loop.
+    // Break the circle before deleting nodes in a normal loop.
     if (tail != NULL)
         tail->Next = NULL;
 
@@ -1259,18 +1159,8 @@ void linkedListMenu() {
         cout << "3. Circular Linked List\n";
         cout << "0. Back to Main Menu\n";
 
-        cout << "Enter your choice: ";
-        cin >> choice;
-
-        if (cin.fail()) {
-            if (cin.eof())
-                return;
-
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << "Invalid input! Enter an integer.\n";
-            continue;
-        }
+        if (!readNumber("Enter your choice: ", choice))
+            return;
 
         switch (choice) {
             case 1:
@@ -1307,18 +1197,8 @@ int main() {
         cout << "3. Linked List\n";
         cout << "0. Exit\n";
 
-        cout << "Enter your choice: ";
-        cin >> choice;
-
-        if (cin.fail()) {
-            if (cin.eof())
-                break;
-
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << "Invalid input! Enter an integer.\n";
-            continue;
-        }
+        if (!readNumber("Enter your choice: ", choice))
+            break;
 
         switch (choice) {
             case 1:
@@ -1342,6 +1222,7 @@ int main() {
         }
     }
 
+    // Free dynamically allocated nodes when the program closes.
     singlyClear();
     doublyClear();
     CircularList::circularClear();
