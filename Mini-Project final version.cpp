@@ -70,7 +70,6 @@ void singlyInsertEnd(int value) {
     cout << value << " inserted.\n";
 }
 
-// Positions start at 1.
 void singlyInsertAtPosition(int value, int position) {
     int length = singlyLength();
 
@@ -93,7 +92,6 @@ void singlyInsertAtPosition(int value, int position) {
     SinglyNode* newNode = new SinglyNode;
     newNode->data = value;
 
-    // Connect the new node before changing the previous link.
     newNode->next = current->next;
     current->next = newNode;
 
@@ -111,7 +109,6 @@ void singlyDeleteBeginning() {
     singlyHead = singlyHead->next;
 
     cout << temp->data << " deleted.\n";
-
     delete temp;
 }
 
@@ -135,7 +132,6 @@ void singlyDeleteEnd() {
     current->next = nullptr;
 
     cout << temp->data << " deleted.\n";
-
     delete temp;
 }
 
@@ -164,8 +160,6 @@ void singlyDeleteAtPosition(int position) {
         current = current->next;
 
     SinglyNode* temp = current->next;
-
-    // Bypass the node before deleting it.
     current->next = temp->next;
 
     cout << temp->data << " deleted from position "
@@ -375,7 +369,6 @@ public:
         top--;
 
         cout << "Popped element: " << poppedVal << "\n";
-
         return poppedVal;
     }
 
@@ -386,7 +379,6 @@ public:
         }
 
         cout << "Top element: " << arr[top] << "\n";
-
         return arr[top];
     }
 
@@ -573,6 +565,688 @@ void queueMenu() {
     } while (choice != 0);
 }
 
+// ==================== DOUBLY LINKED LIST ====================
+
+struct Node {
+    int data;
+    Node* next;
+    Node* prev;
+};
+
+Node* head = NULL;
+
+void insertBeginning(int value) {
+    Node* newNode = new Node;
+
+    newNode->data = value;
+    newNode->next = head;
+    newNode->prev = NULL;
+
+    if (head != NULL) {
+        head->prev = newNode;
+    }
+
+    head = newNode;
+}
+
+void insertEnd(int value) {
+    if (head == NULL) {
+        insertBeginning(value);
+        return;
+    }
+
+    Node* newNode = new Node;
+    Node* temp = head;
+
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    newNode->data = value;
+    newNode->next = NULL;
+    newNode->prev = temp;
+    temp->next = newNode;
+}
+
+void insertMiddle(int value, int position) {
+    if (position < 0) {
+        return;
+    }
+
+    if (position == 0) {
+        insertBeginning(value);
+        return;
+    }
+
+    Node* temp = head;
+    int count = 0;
+
+    while ((temp != NULL) && (count < position - 1)) {
+        temp = temp->next;
+        count++;
+    }
+
+    if (temp == NULL) {
+        return;
+    }
+
+    if (temp->next == NULL) {
+        insertEnd(value);
+        return;
+    }
+
+    Node* newNode = new Node;
+
+    newNode->data = value;
+    newNode->next = temp->next;
+    newNode->prev = temp;
+
+    temp->next->prev = newNode;
+    temp->next = newNode;
+}
+
+void deleteBeginning() {
+    if (head == NULL) {
+        return;
+    }
+
+    Node* temp = head;
+    head = head->next;
+
+    if (head != NULL) {
+        head->prev = NULL;
+    }
+
+    delete temp;
+}
+
+void deleteEnd() {
+    if (head == NULL) {
+        return;
+    }
+
+    if (head->next == NULL) {
+        deleteBeginning();
+        return;
+    }
+
+    Node* temp = head;
+
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    temp->prev->next = NULL;
+    delete temp;
+}
+
+void deleteMiddle(int position) {
+    if (head == NULL) {
+        return;
+    }
+
+    if (position < 0) {
+        return;
+    }
+
+    Node* temp = head;
+    int count = 0;
+
+    while ((temp != NULL) && (count < position)) {
+        temp = temp->next;
+        count++;
+    }
+
+    if (temp == NULL) {
+        return;
+    }
+
+    if (temp->prev == NULL) {
+        deleteBeginning();
+        return;
+    }
+
+    if (temp->next == NULL) {
+        deleteEnd();
+        return;
+    }
+
+    temp->prev->next = temp->next;
+    temp->next->prev = temp->prev;
+
+    delete temp;
+}
+
+void forwardTraverse() {
+    Node* current = head;
+
+    while (current != NULL) {
+        cout << current->data << " -> ";
+        current = current->next;
+    }
+
+    cout << "NULL" << endl;
+}
+
+void backwardTraverse() {
+    if (head == NULL) {
+        cout << "NULL" << endl;
+        return;
+    }
+
+    Node* current = head;
+
+    while (current->next != NULL) {
+        current = current->next;
+    }
+
+    while (current != NULL) {
+        cout << current->data << " -> ";
+        current = current->prev;
+    }
+
+    cout << "NULL" << endl;
+}
+
+int doublyLength() {
+    int count = 0;
+    Node* current = head;
+
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+
+    return count;
+}
+
+void doublyClear() {
+    while (head != NULL)
+        deleteBeginning();
+}
+
+void doublyMenu() {
+    int choice, value, position;
+
+    while (true) {
+        cout << "\n===== DOUBLY LINKED LIST MENU =====\n";
+        cout << "1. Insert at beginning\n";
+        cout << "2. Insert at position (middle)\n";
+        cout << "3. Insert at end\n";
+        cout << "4. Delete from beginning\n";
+        cout << "5. Delete at position (middle)\n";
+        cout << "6. Delete from end\n";
+        cout << "7. Forward traverse\n";
+        cout << "8. Backward traverse\n";
+        cout << "0. Back to Linked List Menu\n";
+        cout << "Positions in this list start at 0.\n";
+
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if (cin.fail()) {
+            if (cin.eof())
+                return;
+
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input! Enter an integer.\n";
+            continue;
+        }
+
+        if (choice == 0)
+            return;
+
+        if (choice < 1 || choice > 8) {
+            cout << "Invalid choice! Choose 0 to 8.\n";
+            continue;
+        }
+
+        if (choice >= 4 && choice <= 6 && head == NULL) {
+            cout << "Cannot delete: list is empty.\n";
+            continue;
+        }
+
+        if (choice >= 1 && choice <= 3) {
+            cout << "Enter value: ";
+            cin >> value;
+
+            if (cin.fail()) {
+                if (cin.eof())
+                    return;
+
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Invalid input! Enter an integer.\n";
+                continue;
+            }
+        }
+
+        if (choice == 2 || choice == 5) {
+            int lastPosition = doublyLength();
+
+            if (choice == 5)
+                lastPosition--;
+
+            cout << "Valid positions: 0 to "
+                 << lastPosition << "\n";
+
+            cout << "Enter position: ";
+            cin >> position;
+
+            if (cin.fail()) {
+                if (cin.eof())
+                    return;
+
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Invalid input! Enter an integer.\n";
+                continue;
+            }
+
+            if (position < 0 || position > lastPosition) {
+                cout << "Invalid position.\n";
+                continue;
+            }
+        }
+
+        switch (choice) {
+            case 1:
+                insertBeginning(value);
+                cout << value << " inserted.\n";
+                break;
+
+            case 2:
+                insertMiddle(value, position);
+                cout << value << " inserted at position "
+                     << position << ".\n";
+                break;
+
+            case 3:
+                insertEnd(value);
+                cout << value << " inserted.\n";
+                break;
+
+            case 4:
+                deleteBeginning();
+                cout << "First node deleted.\n";
+                break;
+
+            case 5:
+                deleteMiddle(position);
+                cout << "Node at position "
+                     << position << " deleted.\n";
+                break;
+
+            case 6:
+                deleteEnd();
+                cout << "Last node deleted.\n";
+                break;
+
+            case 7:
+                cout << "Forward: ";
+                forwardTraverse();
+                break;
+
+            case 8:
+                cout << "Backward: ";
+                backwardTraverse();
+                break;
+        }
+
+        if (choice >= 1 && choice <= 6) {
+            cout << "List: ";
+            forwardTraverse();
+        }
+    }
+}
+
+// ==================== CIRCULAR LINKED LIST ====================
+
+// Separate names from the Doubly Linked List code.
+namespace CircularList {
+
+struct Node {
+    int data;
+    Node* Next;
+    Node* Previous;
+};
+
+Node* head = NULL;
+Node* tail = NULL;
+Node* current = NULL;
+Node* auxiliar = NULL;
+
+int readInt(string message) {
+    string text;
+
+    while (true) {
+        cout << message;
+        cin >> text;
+
+        bool valid = true;
+        int start = 0;
+
+        if (text[0] == '-') {
+            start = 1;
+        }
+
+        if (text.length() == start || text.length() > start + 9) {
+            valid = false;
+        }
+
+        for (int i = start; i < text.length(); i++) {
+            if (text[i] < '0' || text[i] > '9') {
+                valid = false;
+            }
+        }
+
+        if (valid) {
+            int number = 0;
+
+            for (int i = start; i < text.length(); i++) {
+                number = number * 10 + (text[i] - '0');
+            }
+
+            if (start == 1) {
+                number = -number;
+            }
+
+            return number;
+        }
+
+        cout << "Invalid input. Please enter a whole number.\n";
+    }
+}
+
+// Counts how many nodes the list has.
+int countNodes() {
+    if (head == NULL) {
+        return 0;
+    }
+
+    int count = 0;
+    current = head;
+
+    do {
+        count++;
+        current = current->Next;
+    } while (current != head);
+
+    return count;
+}
+
+void insertBeginning(int element) {
+    Node* node = new Node();
+    node->data = element;
+
+    if (head == NULL) {
+        head = node;
+        tail = node;
+        node->Next = node;
+        node->Previous = node;
+    } else {
+        node->Previous = tail;
+        node->Next = head;
+        tail->Next = node;
+        head->Previous = node;
+        head = node;
+    }
+
+    cout << "Inserted " << element << " at the beginning.\n";
+}
+
+void insertEnd(int element) {
+    Node* node = new Node();
+    node->data = element;
+
+    if (head == NULL) {
+        head = node;
+        tail = node;
+        node->Next = node;
+        node->Previous = node;
+    } else {
+        node->Next = head;
+        node->Previous = tail;
+        tail->Next = node;
+        head->Previous = node;
+        tail = node;
+    }
+
+    cout << "Inserted " << element << " at the end.\n";
+}
+
+void insertMiddle(int element, int position) {
+    int size = countNodes();
+
+    if (position < 1 || position > size + 1) {
+        cout << "Invalid position. Valid range: 1 to "
+             << size + 1 << ".\n";
+        return;
+    }
+
+    if (position == 1) {
+        insertBeginning(element);
+        return;
+    }
+
+    if (position == size + 1) {
+        insertEnd(element);
+        return;
+    }
+
+    current = head;
+    int count = 1;
+
+    while (count < position - 1) {
+        current = current->Next;
+        count++;
+    }
+
+    Node* node = new Node();
+    node->data = element;
+    node->Next = current->Next;
+    node->Previous = current;
+
+    current->Next->Previous = node;
+    current->Next = node;
+
+    cout << "Inserted " << element
+         << " at position " << position << ".\n";
+}
+
+void deleteBeginning() {
+    if (head == NULL) {
+        cout << "The list is empty. Nothing to delete.\n";
+        return;
+    }
+
+    auxiliar = head;
+
+    cout << "Deleted " << auxiliar->data
+         << " from the beginning.\n";
+
+    if (head == tail) {
+        head = NULL;
+        tail = NULL;
+    } else {
+        head = head->Next;
+        head->Previous = tail;
+        tail->Next = head;
+    }
+
+    delete auxiliar;
+}
+
+void deleteEnd() {
+    if (head == NULL) {
+        cout << "The list is empty. Nothing to delete.\n";
+        return;
+    }
+
+    auxiliar = tail;
+
+    cout << "Deleted " << auxiliar->data
+         << " from the end.\n";
+
+    if (head == tail) {
+        head = NULL;
+        tail = NULL;
+    } else {
+        tail = tail->Previous;
+        tail->Next = head;
+        head->Previous = tail;
+    }
+
+    delete auxiliar;
+}
+
+void deleteMiddle(int position) {
+    int size = countNodes();
+
+    if (size == 0) {
+        cout << "The list is empty. Nothing to delete.\n";
+        return;
+    }
+
+    if (position < 1 || position > size) {
+        cout << "Invalid position. Valid range: 1 to "
+             << size << ".\n";
+        return;
+    }
+
+    if (position == 1) {
+        deleteBeginning();
+        return;
+    }
+
+    if (position == size) {
+        deleteEnd();
+        return;
+    }
+
+    current = head;
+    int count = 1;
+
+    while (count < position) {
+        current = current->Next;
+        count++;
+    }
+
+    auxiliar = current;
+
+    auxiliar->Previous->Next = auxiliar->Next;
+    auxiliar->Next->Previous = auxiliar->Previous;
+
+    cout << "Deleted " << auxiliar->data
+         << " from position " << position << ".\n";
+
+    delete auxiliar;
+}
+
+void circularTraverse() {
+    if (head == NULL) {
+        cout << "The list is empty.\n";
+        return;
+    }
+
+    current = head;
+
+    do {
+        cout << current->data;
+        current = current->Next;
+
+        if (current != head) {
+            cout << " -> ";
+        }
+
+    } while (current != head);
+
+    cout << " -> (back to head " << head->data << ")\n";
+}
+
+void circularMenu() {
+    int option;
+
+    do {
+        cout << "\n=== CIRCULAR LINKED LIST ===\n";
+        cout << "1. Insert at beginning\n";
+        cout << "2. Insert at middle (position)\n";
+        cout << "3. Insert at end\n";
+        cout << "4. Delete from beginning\n";
+        cout << "5. Delete from middle (position)\n";
+        cout << "6. Delete from end\n";
+        cout << "7. Circular traverse\n";
+        cout << "0. Back\n";
+
+        option = readInt("Choose an option: ");
+
+        switch (option) {
+            case 1:
+                insertBeginning(readInt("Value: "));
+                break;
+
+            case 2: {
+                int value = readInt("Value: ");
+                int position = readInt("Position: ");
+                insertMiddle(value, position);
+                break;
+            }
+
+            case 3:
+                insertEnd(readInt("Value: "));
+                break;
+
+            case 4:
+                deleteBeginning();
+                break;
+
+            case 5:
+                deleteMiddle(readInt("Position: "));
+                break;
+
+            case 6:
+                deleteEnd();
+                break;
+
+            case 7:
+                circularTraverse();
+                break;
+
+            case 0:
+                break;
+
+            default:
+                cout << "Invalid option. Try again.\n";
+        }
+
+        if (option >= 1 && option <= 6) {
+            cout << "Current list: ";
+            circularTraverse();
+        }
+
+    } while (option != 0);
+}
+
+// Cleanup added for the combined application.
+void circularClear() {
+    // Break the circle so nodes can be deleted in a normal loop.
+    if (tail != NULL)
+        tail->Next = NULL;
+
+    while (head != NULL) {
+        Node* temp = head;
+        head = head->Next;
+        delete temp;
+    }
+
+    tail = NULL;
+    current = NULL;
+    auxiliar = NULL;
+}
+
+} // namespace CircularList
+
 // ==================== LINKED LIST MENU ====================
 
 void linkedListMenu() {
@@ -604,13 +1278,11 @@ void linkedListMenu() {
                 break;
 
             case 2:
-                // Add the doubly linked list menu call here.
-                cout << "Doubly Linked List has not been added yet.\n";
+                doublyMenu();
                 break;
 
             case 3:
-                // Add the circular linked list menu call here.
-                cout << "Circular Linked List has not been added yet.\n";
+                CircularList::circularMenu();
                 break;
 
             case 0:
@@ -671,6 +1343,8 @@ int main() {
     }
 
     singlyClear();
+    doublyClear();
+    CircularList::circularClear();
 
     cout << "Program closed.\n";
 
